@@ -1,0 +1,46 @@
+#!/bin/bash
+#This shebang is for synax only. Do not make executable!
+
+_export () { export $1=$2; }
+
+__myenv () {
+    mydts dirs -t ${1} | borg-uniq -t
+}
+_export home    $(__myenv MYENV_RSYNC_HOME_DIR)
+_export backup  $(__myenv MYENV_RSYNC_BACKUP_DIR)
+
+usage () {
+cat << __ENDHERE
+BCH-BACKUP : rsync folders to backup drive
+
+USAGE:
+    bch-backup NAME     - backup folder NAME
+    bch-backup --list   - list folders
+    bch-backup --help   - this help
+    bch-backup --all    - backup all folders
+
+ENVIRONMENT:
+    \$MYENV_RSYNC_HOME_DIR is [$home]
+    \$MYENV_RSYNC_BACKUP_DIR is [$backup]
+__ENDHERE
+}
+
+PROG=$(basename $0)
+case .${1} in
+    .|-h.|--help.)
+        usage
+        ;;
+    .--list)
+        /bin/ls -1 ${home}
+        ;;
+    .--backup)
+        [ ! -d "${backup}" ] && echo backup not attached && return
+        [ ! -d "${home}"   ] && echo home not defined && return
+        for name in $(/bin/ls ${home}); do 
+            target=${home}/${name}
+            echo "[$PROG]: ${target} --> ${backup}"
+            rsync -av --exclude .mytags ${target} ${backup}
+        done
+        ;;
+esac
+
