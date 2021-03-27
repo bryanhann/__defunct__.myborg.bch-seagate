@@ -3,11 +3,10 @@
 
 _export () { export $1=$2; }
 
-__myenv () {
-    mydts dirs -t ${1} | borg-uniq -t
-}
-_export home    $(__myenv MYENV_RSYNC_HOME_DIR)
-_export backup  $(__myenv MYENV_RSYNC_BACKUP_DIR)
+_export PROG    $(basename $0)
+_export home    $(mydts uniq -r MYENV_RSYNC_HOME_DIR)
+_export backup  $(mydts uniq -r MYENV_RSYNC_BACKUP_DIR)
+
 
 usage () {
 cat << __ENDHERE
@@ -25,7 +24,6 @@ ENVIRONMENT:
 __ENDHERE
 }
 
-PROG=$(basename $0)
 case .${1} in
     .|-h.|--help.)
         usage
