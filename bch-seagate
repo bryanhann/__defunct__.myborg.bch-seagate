@@ -32,7 +32,7 @@ case .${1} in
         for name in $(/bin/ls ${home}); do 
             target=${home}/${name}
             echo "[$PROG]: ${target} --> ${backup}"
-            rsync -av --exclude .mytags ${target} ${backup}
+            rsync -av --del --exclude .mytags ${target} ${backup}
         done
         ;;
     *)
