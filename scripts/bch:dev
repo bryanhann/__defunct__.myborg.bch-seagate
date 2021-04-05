@@ -1,0 +1,19 @@
+#!/bin/bash
+#This shebang is for synax only. Do not make executable!
+
+bch:dev:list () {
+    mydts -f list 4tag MYDEV
+}
+
+bch:dev:insitu4path () {
+    pushd ${1} > /dev/null || return
+    local rpath=./insitu.d/insitu
+    [ -f $rpath ] && source $rpath
+    popd > /dev/null
+}
+
+bch:dev:insitu_all () {
+    for path in $(bch:dev:list); do
+        bch:dev:insitu4path $path
+    done
+}

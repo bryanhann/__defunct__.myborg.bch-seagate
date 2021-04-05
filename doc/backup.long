@@ -1,0 +1,8 @@
+cat << EOF
+USAGE
+        ${prog} ${name} [OPTIONS] [ARGS]
+
+OPTIONS
+        --foo
+        --bar
+EOF

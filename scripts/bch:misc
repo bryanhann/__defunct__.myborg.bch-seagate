@@ -1,0 +1,6 @@
+bch:misc:listdir () {
+    for name in $(/bin/ls -1 $1); do
+        echo ${1}/${name}
+    done
+}
+

@@ -1,43 +1,37 @@
 #!/bin/bash
 #This shebang is for synax only. Do not make executable!
 
-_export () { export $1=$2; }
+export ROOT=$(dirname $0)
+export PROG=$(basename $0)
+source ${ROOT}/scripts/bch:misc
+source ${ROOT}/scripts/bch:dev
 
-_export PROG    $(basename $0)
-_export home    $(mydts uniq -r MYENV_RSYNC_HOME_DIR)
-_export backup  $(mydts uniq -r MYENV_RSYNC_BACKUP_DIR)
+source mycmd:
 
-usage () {
-cat << __ENDHERE
-${PROG} : rsync folders to backup drive
+__home   () { echo $(mydts uniq -r MYENV_RSYNC_HOME_DIR); }
+__backup () { echo $(seagate_blue_backups 2> /dev/null); }
 
-USAGE:
-    ${PROG} --list   - list folders
-    ${PROG} --help   - this help
-    ${PROG} --backup - backup all folders
-
-ENVIRONMENT:
-    \$MYENV_RSYNC_HOME_DIR is [$home]
-    \$MYENV_RSYNC_BACKUP_DIR is [$backup]
-__ENDHERE
+NULL_bch_seagate () {
+    $PROG -h
 }
 
-case .${1} in
-    .--list)
-        /bin/ls -1 ${home}
-        ;;
-    .--backup)
-        [ ! -d "${backup}" ] && echo backup not attached && exit
-        [ ! -d "${home}"   ] && echo home not defined && exit
-        for name in $(/bin/ls ${home}); do 
-            target=${home}/${name}
-            echo "[$PROG]: ${target} --> ${backup}"
-            rsync -av --del --exclude .mytags ${target} ${backup}
-        done
-        ;;
-    *)
-        usage
-        ;;
+INIT_bch_seagate () {
+    mydts -f
+    bch:dev:insitu_all
+}
 
-esac
+USER_bch_seagate_check () {
+    echo "home: [$(__home)]"
+    echo "backup: [$(__backup)]"
+}
 
+USER_bch_seagate_backup () {
+    [ ! -d "$(__backup)"  ] && echo backup not attached && exit
+    [ ! -d "$(__home)" ] && echo home not defined && exit
+    for target in $(bch:misc:listdir $(__home)); do
+        echo "[$PROG]: ${target} --> $(__backup)"
+        rsync -av --del --exclude .mytags ${target} $(__backup)
+    done
+}
+
+mycmd:main $0 $*
