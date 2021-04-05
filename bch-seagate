@@ -27,8 +27,8 @@ case .${1} in
         /bin/ls -1 ${home}
         ;;
     .--backup)
-        [ ! -d "${backup}" ] && echo backup not attached && return
-        [ ! -d "${home}"   ] && echo home not defined && return
+        [ ! -d "${backup}" ] && echo backup not attached && exit
+        [ ! -d "${home}"   ] && echo home not defined && exit
         for name in $(/bin/ls ${home}); do 
             target=${home}/${name}
             echo "[$PROG]: ${target} --> ${backup}"
